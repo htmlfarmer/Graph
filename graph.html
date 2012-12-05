@@ -1,0 +1,77 @@
+<html>              
+  <head>
+<script type="text/javascript" src="../csv/csv.js"></script>
+<script type="text/javascript" src="../file/file.js"></script>
+<script type="text/javascript" src="Array.prototype.stats.js"></script>
+<script type="text/javascript" src="jquery.flot.csv.js"></script>
+<script language="javascript" type="text/javascript" src="flot/jquery.js"></script>
+<script language="javascript" type="text/javascript" src="flot/jquery.flot.js"></script> 
+<script language="javascript" type="text/javascript">
+
+    function file_clicker() {
+      var fileObj = document.getElementById("files");
+      var fp = new File(fileObj);
+      fp.read(graph);
+    }
+    function uri_clicker() {
+      var uri = document.getElementById("uri").value;
+      var fp = new File(uri);
+      fp.uri(graph);
+    }
+    function graph(text) { 
+      csv = CSV(text); // take the text from the file and convert it to a CSV row by row
+      var csvtable = document.getElementById("csvtable");
+      csvtable.innerHTML = XML(csv); // show the contents of the CSV file 
+      csv = FlotCSV(csv); // autodetection
+      // Setup the Options for the Flot Chart
+      var options = { // default to bar graph
+        /*bar: {stack: 0,
+              lines: {show: false, steps: false },
+              bars: {show: true, barWidth: 0.9, align: 'center',},},
+              */
+        series: {
+          lines: { show: true },
+          points: { show: false }
+        },
+        crosshair: { mode: "x" },
+        grid: { hoverable: true, clickable: true }, 
+        xaxis: {},
+      };
+      options.xaxis = csv.ticks.xaxis;
+      
+      $.plot($("#graphlocation"), csv.data, options);
+    }
+    var XML = function (csv) {
+      var str = "<table style=\"width:100%;\" border=1>\n"; 
+      str += "<tbody>\n"; 
+      for ( var i=0; i < csv.length; i++){
+        str += '<tr class="row" style=\"width:100%;\"><td class="rown">R' + i + '</td>';
+        for ( var j=0; j < csv[i].length; j++){
+            str += '<td class="element">' + csv[i][j] + '</td>';
+          }
+        str += "</tr>\n";
+      }  
+      str += "</tbody>\n"; 
+      str += "</table>\n";
+      return str;
+    }
+  </script>
+  </head>
+  <body>                            
+    <h1>Graph</h1>
+    CSV / Flot / Data Autodetection
+    <h3>CSV File:</h3>
+    <input type="file" id="files" name="file"/> 
+    <button onclick="file_clicker()">Load File</button><br /><br />
+    <h3>Web CSV Address:</h3>
+    <input type="text" id="uri" name="uri" value="city.csv"/> 
+    <button onclick="uri_clicker()">Load File</button><br /><br />
+    <h3>Plot:</h3>
+    <div id="content"></div>
+    <div id="graphlocation" style="width:600px;height:300px;">
+    </div>
+    <h3>File:</h3>
+    <div id="csvtable">
+    </div>                       
+    <body>
+</html>
